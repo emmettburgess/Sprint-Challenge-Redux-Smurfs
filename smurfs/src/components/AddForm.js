@@ -1,76 +1,55 @@
-import React from 'react';
+import axios from 'axios'
+export const FETCHING_SMURFS = "FETCHING_SMURFS";
+export const FETCHING_SUCCESS = "FETCHING_SUCCESS";
+export const FETCHING_FAILURE = "FETCHING_FAILURE";
+export const ADD_SMURFS_START = "ADD_SMURFS_START";
+export const ADD_SMURFS = "ADD_SMURFS";
+export const ADD_SMURF_FAILURE = "ADD_SMURF_FAILURE";
 
-import { connect } from 'react-redux';
-import { addSmurf } from '../actions';
-
-class AddForm extends React.Component {
-state = {
-    smurf: {
-        name: '',
-        age: '',
-        height: ''
-    }
-};
-
-handleChanges = e => {
-    
-    this.setState({
-        smurf: {
-            ...this.state.smurf,
-            [e.target.name]: e.target.value
-        }
-    })
-}
-
-addSmurf = e => {
-    e.preventDefault();
-
-    this.props.addSmurf(this.state.smurf);
-
-}
-
-render() {
-    console.log(this.state.smurf)
-    return (
-        <div>
-            <h2> Add a Smurf! </h2>
-            <form onSubmit={this.addSmurf}>
-                <input
-                type='text'
-                placeholder='name'
-                name='name'
-                onChange={this.handleChanges}
-                value={this.state.smurf.name}
-                 />
-
-                <input
-                type='number'
-                placeholder='age'
-                name='age'
-                onChange={this.handleChanges}
-                value={this.state.smurf.age}
-                 /> 
-
-                <input 
-                type='number'
-                placeholder='height'
-                name='height'
-                onChange={this.handleChanges}
-                value={this.state.smurf.height}
-                /> 
-
-                <button onClick={this.addSmurf} > Add yo smurf! </button>
-            </form>
-        </div>
+export const getsmurf = (thegoods) => dispatch =>{
+    dispatch({type: FETCHING_SMURFS})
+  
+    axios.get(
+        `http://localhost:3333/smurfs`, thegoods
     )
-}
-}
-
-const mapStateToProps = ({ addingSmurfs }) => ({
-    addingSmurfs
-})
-
-export default connect(
-   mapStateToProps,
-   { addSmurf }
-)(AddForm);
+    .then(res =>{
+         console.log(res
+            )
+    //  localStorage.setItem('token', res.data.payload)
+        dispatch({
+            type:FETCHING_SUCCESS,
+            payload: res.data, 
+  
+        })
+    })
+    .catch(err =>{
+        dispatch({
+            type:FETCHING_FAILURE,
+            payload: err
+  
+        })
+    })
+  
+  
+  
+  }
+  
+  export const addSmurf = (smurf) => dispatch =>{
+    axios.post(
+        `http://localhost:3333/smurfs`, smurf,
+        // {headers: {authorization:localStorage.getItem('token')}}
+    )
+        .then(res =>{
+            dispatch({ 
+                type:ADD_SMURFS,
+                payload: res.data 
+  
+            })
+        })
+        .catch(err =>
+          dispatch({
+            type:ADD_SMURF_FAILURE,
+            payload:err
+          })
+          )
+  }
